@@ -120,9 +120,28 @@ public abstract class Graph {
 	 * 
 	 * @return The degree sequence of this graph.
 	 */
+	//꼭지점에 연결된 선이 많은 순대로 정렬
 	public List<Integer> degreeSequence() {
-		// XXX: Implement in part 1 of week 2
-		return null;
+		//꼭지점 좌표 나타내는 배열
+		List<Integer> numList = new ArrayList<Integer>();
+		List<Integer> sortList = new ArrayList<Integer>();
+		//꼭지점 수만큼 degree 값 생성
+		for(int i=0; i<numVertices; i++) {
+			numList.add(i);
+		}
+		for(int i=0; i<numVertices; i++) {
+			sortList.add(getNeighbors(numList.get(i)).size());
+		}
+		//연결된 선이 많은 순대로 정렬
+		for(int i=0; i<sortList.size()-1; i++) {
+			for(int j=i+1; j<sortList.size(); j++) {
+				if(sortList.get(i)<sortList.get(j)) {
+					Collections.swap(sortList, i, j);
+				}
+			}
+			
+		}
+		return sortList;
 	}
 	
 	/**

@@ -102,7 +102,8 @@ public class GraphAdjMatrix extends Graph {
 	 * 
 	 * @param v the index of vertex.
 	 * @return List<Integer> a list of indices of vertices.  
-	 */	
+	 */
+	//Çà·ÄÀÇ °ö¼À ÀÌ¿ë
 	public List<Integer> getDistance2(int v) {
 		// XXX Implement this method in week 2
 		return null;
