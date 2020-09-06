@@ -122,15 +122,10 @@ public abstract class Graph {
 	 */
 	//꼭지점에 연결된 선이 많은 순대로 정렬
 	public List<Integer> degreeSequence() {
-		//꼭지점 좌표 나타내는 배열
-		List<Integer> numList = new ArrayList<Integer>();
 		List<Integer> sortList = new ArrayList<Integer>();
-		//꼭지점 수만큼 degree 값 생성
+
 		for(int i=0; i<numVertices; i++) {
-			numList.add(i);
-		}
-		for(int i=0; i<numVertices; i++) {
-			sortList.add(getNeighbors(numList.get(i)).size());
+			sortList.add(getNeighbors(i).size()+getInNeighbors(i).size());
 		}
 		//연결된 선이 많은 순대로 정렬
 		for(int i=0; i<sortList.size()-1; i++) {
@@ -281,6 +276,7 @@ public abstract class Graph {
 		// Test your distance2 code here.
 		System.out.println("Testing distance-two methods on sample graphs...");
 		System.out.println("Goal: implement method using two approaches.");
+		System.out.println(graphFromFile.getDistance2(3));
 
 
 		
