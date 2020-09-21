@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -28,7 +29,7 @@ import util.GraphLoader;
  * Nodes in the graph are intersections between 
  *
  */
-public class MapGraph {
+public class MapGraph  {
 	//TODO: Add your member variables here in WEEK 3
 	HashMap<GeographicPoint, MapNode> graph;
 	
@@ -185,12 +186,18 @@ public class MapGraph {
 				}
 			}
 		}
-
+		//경로 없는 경우
 		if (!found) {
 			System.out.println("No path exists");
 			return null;
 		}
 		// reconstruct the path
+		return parentPath(startPoint, goalPoint, parentMap);
+
+	}
+	
+	//parentmap을 리턴하는 핼퍼 메소드
+	public LinkedList<GeographicPoint> parentPath(MapNode startPoint, MapNode goalPoint, HashMap<MapNode, MapNode> parentMap){
 		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
 		MapNode curr = goalPoint;
 		while (curr != startPoint) {
@@ -228,11 +235,65 @@ public class MapGraph {
 										  GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 4
-
+		MapNode startPoint = graph.get(start);
+		MapNode goalPoint = graph.get(goal);
+		
+		//시작점이나 끝 점이 null인 경우
+		if(start==null||goal==null) {
+			return null;
+		}
+		
+		HashMap<MapNode, MapNode> parentMap = new HashMap<MapNode, MapNode>();
+		//방문한 노드 수
+		int numNode = 0;
+		//priority queue
+		PriorityQueue<MapNode> toExplore = new PriorityQueue<>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		boolean found = false;
+		
+		
+		//시작지점과, 거리 0을 큐에 넣는다
+		startPoint.setDistance(0);
+		toExplore.offer(startPoint);
+		
+		//큐가 비지 않으면 계속 실행
+		while (!toExplore.isEmpty()) {
+			MapNode curr = toExplore.remove();
+			numNode++;
+			//처음 노드가 아닌 경우 처음 노드와 현재 노드 사이의 edge값 반환
+			if(!visited.contains(curr)) {
+				visited.add(curr);
+				if(curr == goalPoint) {
+					found = true;
+					break;
+				}
+				List<MapNode> neighbors = curr.getNeighbors();
+				System.out.println(curr.getLocation());
+				for(MapNode n : neighbors) {
+					//n이 visited에 있지 않은 경우
+					if(!visited.contains(n)) {
+						double newDis =  curr.betweenDis(curr, n);
+						if(newDis + curr.distanceToStart < n.distanceToStart) {
+							n.setDistance(curr.distanceToStart + newDis);
+							parentMap.put(n, curr);
+							toExplore.offer(n);
+							nodeSearched.accept(curr.getLocation());
+						}
+					}
+					
+				}
+	
+				
+			}
+		}
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
-		
-		return null;
+		if (!found) {
+			System.out.println("No path exists");
+			return null;
+		}
+		System.out.println("Nodes visited to search : "+numNode);
+		return parentPath(startPoint, goalPoint, parentMap);
 	}
 
 	/** Find the path from start to goal using A-Star search
@@ -260,11 +321,69 @@ public class MapGraph {
 											 GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 4
+		MapNode startPoint = graph.get(start);
+		MapNode goalPoint = graph.get(goal);
+		
+		//시작점이나 끝 점이 null인 경우
+		if(start==null||goal==null) {
+			return null;
+		}
+		
+		HashMap<MapNode, MapNode> parentMap = new HashMap<MapNode, MapNode>();
+		//방문한 노드 수
+		int numNode = 0;
+		//priority queue
+		PriorityQueue<MapNode> toExplore = new PriorityQueue<>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		boolean found = false;
+		
+		
+		//시작지점과, 거리 0을 큐에 넣는다
+		startPoint.setDistance(0);
+		toExplore.offer(startPoint);
+		
+		//큐가 비지 않으면 계속 실행
+		while (!toExplore.isEmpty()) {
+			MapNode curr = toExplore.remove();
+			numNode++;
+			//처음 노드가 아닌 경우 처음 노드와 현재 노드 사이의 edge값 반환
+			if(!visited.contains(curr)) {
+				visited.add(curr);
+				if(curr == goalPoint) {
+					found = true;
+					break;
+				}
+				List<MapNode> neighbors = curr.getNeighbors();
+				System.out.println(curr.getLocation());
+				for(MapNode n : neighbors) {
+					//n이 visited에 있지 않은 경우
+					if(!visited.contains(n)) {
+						//dijkstra에서 n과 목표점 까지의 거리를 추가
+						double newDis =  curr.betweenDis(curr, n);
+						if(newDis + curr.distanceToStart < n.distanceToStart) {
+							n.setDistance(curr.distanceToStart + newDis + n.getLocation().distance(goal));
+							parentMap.put(n, curr);
+							toExplore.offer(n);
+							nodeSearched.accept(curr.getLocation());
+						}
+					}
+					
+				}
+	
+				
+			}
+		}
+		// Hook for visualization.  See writeup.
+		//nodeSearched.accept(next.getLocation());
+		if (!found) {
+			System.out.println("No path exists");
+			return null;
+		}
+		System.out.println("Nodes visited to search : "+numNode);
+		return parentPath(startPoint, goalPoint, parentMap);
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
-		
-		return null;
 	}
 
 	
@@ -317,7 +436,7 @@ public class MapGraph {
 		
 		
 		/* Use this code in Week 3 End of Week Quiz */
-		/*MapGraph theMap = new MapGraph();
+		MapGraph theMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/maps/utc.map", theMap);
 		System.out.println("DONE.");
@@ -329,7 +448,7 @@ public class MapGraph {
 		List<GeographicPoint> route = theMap.dijkstra(start,end);
 		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
 
-		*/
+		
 		
 	}
 	

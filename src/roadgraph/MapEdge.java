@@ -18,4 +18,12 @@ public class MapEdge {
 		this.distance = distance;
 		
 	}
+	
+	public double getDistance() {
+		return distance;
+	}
+	
+	public String toString() {
+		return " intersection street: "+startName; 
+	}
 }
